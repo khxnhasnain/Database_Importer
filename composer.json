@@ -1,0 +1,14 @@
+{
+    "name": "gemini/excel-db-importer",
+    "description": "High performance PHP Excel to DB importer",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "openspout/openspout": "^4.24"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

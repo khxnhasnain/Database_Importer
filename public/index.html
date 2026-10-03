@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XcelSync - Fast Excel to Database Importer</title>
+    <meta name="description"
+        content="Stream millions of rows from Excel into SQLite or MySQL databases with automatic validation and dynamic schemas.">
+    <!-- Typography and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="glass-bg-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-file-excel logo-icon"></i>
+                <span class="logo-text">Xcel<span class="gradient-text">Sync</span></span>
+            </div>
+            <p class="subtitle">High-Performance Excel & CSV Database Ingestion Engine</p>
+        </header>
+
+        <!-- Wizard Steps -->
+        <div class="wizard-progress">
+            <div class="step active" id="step-indicator-1">
+                <div class="step-num">1</div>
+                <div class="step-label">Upload File</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-indicator-2">
+                <div class="step-num">2</div>
+                <div class="step-label">Database Settings</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-indicator-3">
+                <div class="step-num">3</div>
+                <div class="step-label">Map & Schema</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-indicator-4">
+                <div class="step-num">4</div>
+                <div class="step-label">Ingest Data</div>
+            </div>
+        </div>
+
+        <main class="app-card">
+            <!-- STEP 1: Upload File -->
+            <section id="step-1" class="step-section active">
+                <div class="section-header">
+                    <h2>Choose Excel or CSV File</h2>
+                    <p>Select your file to analyze its structure. Supports formats up to millions of rows.</p>
+                </div>
+
+                <div class="drop-zone" id="drop-zone">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <p class="drop-text">Drag & drop your file here or <span class="browse-btn">Browse Files</span></p>
+                    <p class="file-limits">Supported files: .xlsx, .csv, .ods (max 500MB)</p>
+                    <input type="file" id="file-input" accept=".xlsx,.csv,.ods" style="display: none;">
+                </div>
+
+                <div class="file-preview-card" id="file-preview-card" style="display: none;">
+                    <div class="file-info">
+                        <i class="fa-solid fa-file-excel file-icon"></i>
+                        <div class="details">
+                            <span class="file-name" id="preview-filename">data.xlsx</span>
+                            <span class="file-size" id="preview-filesize">24.5 MB</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-icon-only" id="remove-file-btn" title="Remove File">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="goto-step-2-btn" disabled>
+                        <span>Analyze & Continue</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: Database Settings -->
+            <section id="step-2" class="step-section">
+                <div class="section-header">
+                    <h2>Target Database Configurations</h2>
+                    <p>Configure SQLite for zero-setup or enter your MySQL details.</p>
+                </div>
+
+                <div class="db-selector">
+                    <label class="db-card active" data-type="sqlite">
+                        <input type="radio" name="db_type" value="sqlite" checked style="display: none;">
+                        <i class="fa-solid fa-database db-icon"></i>
+                        <div class="db-meta">
+                            <span class="db-title">SQLite (Recommended)</span>
+                            <span class="db-desc">Self-contained database file. No setup required.</span>
+                        </div>
+                    </label>
+
+                    <label class="db-card" data-type="mysql">
+                        <input type="radio" name="db_type" value="mysql" style="display: none;">
+                        <i class="fa-solid fa-server db-icon"></i>
+                        <div class="db-meta">
+                            <span class="db-title">MySQL Database</span>
+                            <span class="db-desc">Connect to external MySQL / MariaDB Server.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- SQLite Configuration Panel -->
+                <div id="sqlite-panel" class="db-panel active">
+                    <div class="form-group">
+                        <label for="sqlite-table">Target Table Name</label>
+                        <input type="text" id="sqlite-table" placeholder="e.g. imported_records" value="excel_records">
+                        <small class="form-note">Must contain only letters, numbers, and underscores.</small>
+                    </div>
+                </div>
+
+                <!-- MySQL Configuration Panel -->
+                <div id="mysql-panel" class="db-panel">
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="mysql-host">Host Name / IP</label>
+                            <input type="text" id="mysql-host" value="127.0.0.1">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="mysql-port">Port</label>
+                            <input type="number" id="mysql-port" value="3306">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="mysql-username">Username</label>
+                            <input type="text" id="mysql-username" value="root">
+                        </div>
+                        <div class="form-group col">
+                            <label for="mysql-password">Password</label>
+                            <input type="password" id="mysql-password" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="mysql-dbname">Database Name</label>
+                            <input type="text" id="mysql-dbname" value="excel_import_db">
+                            <small class="form-note">Will be created automatically if it doesn't exist.</small>
+                        </div>
+                        <div class="form-group col">
+                            <label for="mysql-table">Table Name</label>
+                            <input type="text" id="mysql-table" value="excel_records">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions flex-between">
+                    <button class="btn btn-secondary" id="back-to-step-1">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Back</span>
+                    </button>
+                    <button class="btn btn-primary" id="goto-step-3-btn">
+                        <span>Database Connect</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 3: Mapping & Schema -->
+            <section id="step-3" class="step-section">
+                <div class="section-header">
+                    <h2>Map Columns & Rules</h2>
+                    <p>Map your spreadsheet headers to standard fields and validation rules.</p>
+                </div>
+                <!-- Custom Field Mapping -->
+                <div class="mapping-card">
+                    <h3>Required & Special Fields</h3>
+                    <div class="mapping-row">
+                        <div class="field-meta">
+                            <label>Name Column</label>
+                            <span>Cleans spaces & standardizes text</span>
+                        </div>
+                        <div class="field-selector">
+                            <select id="map-name" class="map-dropdown">
+                                <option value="">-- Do not import --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mapping-row">
+                        <div class="field-meta">
+                            <label>Mobile Number Column</label>
+                            <span>10 digits starting with 6,7,8,9 (Skip invalid rows)</span>
+                        </div>
+                        <div class="field-selector">
+                            <select id="map-mobile" class="map-dropdown">
+                                <option value="">-- Choose Column --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mapping-row">
+                        <div class="field-meta">
+                            <label>Date of Birth Column</label>
+                            <span>Auto-formats to YYYY-MM-DD</span>
+                        </div>
+                        <div class="field-selector">
+                            <select id="map-dob" class="map-dropdown">
+                                <option value="">-- Do not import --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column Preview & Configuration -->
+                <div class="schema-card">
+                    <h3>Spreadsheet Columns & Types</h3>
+                    <div class="table-container">
+                        <table id="schema-table">
+                            <thead>
+                                <tr>
+                                    <th width="80"><input type="checkbox" id="select-all-columns" checked> Import</th>
+                                    <th>Column Name (Excel)</th>
+                                    <th>Database Field Name</th>
+                                    <th>Detected Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="actions flex-between">
+                    <button class="btn btn-secondary" id="back-to-step-2">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Back</span>
+                    </button>
+                    <button class="btn btn-accent" id="start-import-btn">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Initialize Ingestion</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 4: Ingestion Progress -->
+            <section id="step-4" class="step-section">
+                <div class="section-header">
+                    <h2>Ingesting Data...</h2>
+                    <p id="ingest-status-text">Uploading file structure and configuring worker thread.</p>
+                </div>
+
+                <!-- Stats Dashboard -->
+                <div class="stats-grid">
+                    <div class="stat-box blue">
+                        <span class="stat-label">Total Data</span>
+                        <span class="stat-value" id="stat-total-rows">-</span>
+                    </div>
+                    <div class="stat-box orange">
+                        <span class="stat-label">Processed</span>
+                        <span class="stat-value" id="stat-processed-rows">0</span>
+                    </div>
+                    <div class="stat-box green">
+                        <span class="stat-label">Correct Data</span>
+                        <span class="stat-value" id="stat-imported-rows">0</span>
+                    </div>
+                    <div class="stat-box red">
+                        <span class="stat-label">Invalid Data</span>
+                        <span class="stat-value" id="stat-skipped-rows">0</span>
+                    </div>
+                </div>
+
+                <!-- Progress Details -->
+                <div class="progress-details">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="import-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-meta">
+                        <span id="progress-percentage">0% Completed</span>
+                        <span id="import-speed">Calculating speed...</span>
+                    </div>
+                </div>
+
+                <!-- Ingestion Logs / Meta -->
+                <div class="log-panel" id="log-panel">
+                    <div class="log-row info">Initializing database tables...</div>
+                </div>
+
+                <div class="actions flex-end">
+                    <button class="btn btn-danger" id="cancel-import-btn">
+                        <i class="fa-solid fa-circle-stop"></i>
+                        <span>Cancel Import</span>
+                    </button>
+                    <button class="btn btn-primary" id="finish-btn" style="display: none;">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Start New Import</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Main Application Logic -->
+    <script src="app.js?v=3"></script>
+</body>
+
+</html>

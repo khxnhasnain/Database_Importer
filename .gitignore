@@ -1,0 +1,30 @@
+# Composer dependencies
+/vendor/
+
+# Runtime and generated data files
+/data/*
+!/data/.gitkeep
+!/data/uploads/
+/data/uploads/*
+!/data/uploads/.gitkeep
+
+# SQLite local databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary error logs & session data
+errors_*.csv
+status_*.json
+config_*.json
+
+# Logs & temp files
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE and Editor configurations
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
